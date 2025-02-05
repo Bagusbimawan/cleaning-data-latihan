@@ -41,20 +41,36 @@ category_stats = df.groupby('product_category_name')[numeric_columns].mean()
 
 # Menampilkan statistik rata-rata per kategori setelah cleaning
 st.subheader("Pertayaan Pertama ")
-st.write("Prediksi Barang yang bisa Meningkat sesuai dengan kategori?")
-st.subheader("Fitur Rata-rata per Kategori")
-st.write(category_stats[['product_name_lenght', 'product_description_lenght', 'product_photos_qty', 'product_weight_g', 'total_dimension']])
+st.write("1. **Kategori produk mana yang memiliki produk lebih besar dan lebih berat?**")
 
-# Plot diagram batang untuk fitur yang dipilih
+# Menambahkan fitur total dimensi
+df['total_dimension'] = df['product_length_cm'] + df['product_height_cm'] + df['product_width_cm']
+
+# Menghitung rata-rata per kategori
+numeric_columns = df.select_dtypes(include=['float64']).columns  # Memilih kolom numerik
+category_stats = df.groupby('product_category_name')[numeric_columns].mean()
+
+
+category_stats_sorted_by_weight = category_stats.sort_values(by='product_weight_g', ascending=False)
+category_stats_sorted_by_dimension = category_stats.sort_values(by='total_dimension', ascending=False)
+
+# Menampilkan kategori dengan produk berat dan dimensi terbesar
+st.write("Kategori dengan Produk Berat Terbesar:")
+st.write(category_stats_sorted_by_weight[['product_weight_g']].head())
+
+st.write("Kategori dengan Produk Dimensi Terbesar:")
+st.write(category_stats_sorted_by_dimension[['total_dimension']].head())
+
+# Plot untuk visualisasi
 fig, ax = plt.subplots(figsize=(10, 6))
-category_stats[['product_name_lenght', 'product_description_lenght', 'product_photos_qty', 'product_weight_g', 'total_dimension']].plot(kind='bar', ax=ax)
-plt.title('Fitur Rata-rata per Kategori Setelah Cleaning')
+category_stats[['product_weight_g', 'total_dimension']].plot(kind='bar', ax=ax)
+plt.title('Rata-rata Berat dan Dimensi Total per Kategori')
 plt.ylabel('Nilai Rata-rata')
 st.pyplot(fig)
 
 
 st.subheader("Pertayaan Kedua")
-st.write(" Apakah Berat dan Dimensi Produk Mempengaruhi Kategori atau Harga?")
+st.write("2. **Apakah berat dan dimensi produk memengaruhi kategori atau harga?**")
 # Plot hubungan antara kategori dan berat produk
 st.subheader("Distribusi Berat Produk Berdasarkan Kategori")
 plt.figure(figsize=(12, 6))
@@ -88,8 +104,8 @@ st.pyplot(fig)
 
 st.subheader("Kesimpulan")
 
-st.write("1. Prediksi Barang yang bisa Meningkat sesuai dengan kategori?")
-st.write("Setelah membersihkan data dan menghitung nilai rata-rata untuk beberapa fitur numerik per kategori produk, dapat dilihat bahwa kategori produk dengan dimensi total yang lebih besar memiliki perbedaan yang signifikan dalam hal berat dan jumlah foto produk.")
+st.write("1. **Kategori produk mana yang memiliki produk lebih besar dan lebih berat?**")
+st.write("Berdasarkan analisis, kategori produk yang memiliki dimensi total lebih besar dan berat lebih tinggi adalah kategori dengan produk yang lebih besar dan lebih berat. Kategori produk ini berpotensi memiliki biaya produksi dan pengiriman yang lebih besar.")
 st.write("2. Apakah Berat dan Dimensi Produk Mempengaruhi Kategori atau Harga?")
 st.write("Dapat diasumsikan bahwa produk dengan dimensi dan berat yang lebih besar mungkin cenderung lebih mahal, meskipun ini perlu verifikasi lebih lanjut melalui analisis harga. Kategori dengan produk besar kemungkinan memiliki harga yang lebih tinggi karena biaya produksi dan pengiriman yang lebih besar.")
 
